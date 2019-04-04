@@ -6,27 +6,29 @@ class Game extends Component {
     super(props);
 
     this.state = {
-      history: [{ squares: Array(9).fill(null) }],
+      history: [{ squares: Array(9).fill(null), location: null }],
       stepNumber: 0,
       xIsNext: true,
       movesInAscendingOrder: true
     };
   }
 
-  handleClick = i => {
+  handleClick = square => {
     const { xIsNext, stepNumber } = { ...this.state };
     const history = this.state.history.slice(0, stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
 
-    if (this.calculateWinner(squares) || squares[i]) {
+    if (this.calculateWinner(squares) || squares[square]) {
       return;
     }
 
-    squares[i] = xIsNext ? "X" : "O";
+    squares[square] = xIsNext ? "X" : "O";
 
     this.setState({
-      history: history.concat([{ squares: squares }]),
+      history: history.concat([
+        { squares: squares, moveLocation: this.getMoveLocation(square) }
+      ]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext
     });
@@ -37,11 +39,18 @@ class Game extends Component {
   };
 
   handleJumpTo = step => {
-    console.log(step);
     this.setState({
       xIsNext: step % 2 === 0,
       stepNumber: step
     });
+  };
+
+  getMoveLocation = squareIndex => {
+    const gridSize = 3;
+    const row = Math.ceil((squareIndex + 1) / gridSize);
+    const col = (squareIndex % gridSize) + 1;
+
+    return { col, row };
   };
 
   calculateWinner = squares => {
@@ -82,7 +91,11 @@ class Game extends Component {
 
     const moves = history.map(move => {
       const step = move.squares.filter(s => s !== null).length;
-      const desc = step ? "Go to move #: " + step : "Go to start";
+      const desc = step
+        ? `Go to move #: ${step} (${move.moveLocation.col}, ${
+            move.moveLocation.row
+          })`
+        : "Go to start";
       return (
         <li key={step}>
           <button onClick={() => this.handleJumpTo(step)}>
