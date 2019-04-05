@@ -37,7 +37,7 @@ ul {
   outline: none;
 }
 
-.winner {
+.square.winner {
   background-color: yellow;
 }
 
