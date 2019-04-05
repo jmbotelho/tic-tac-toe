@@ -119,7 +119,11 @@ class Game extends Component {
     if (winner) {
       status = `Winner: ${winner}`;
     } else {
-      status = `Next Player: ${xIsNext ? "X" : "O"}`;
+      if (squares.filter(square => square === null).length) {
+        status = `Next Player: ${xIsNext ? "X" : "O"}`;
+      } else {
+        status = "The game is a draw";
+      }
     }
 
     return (
